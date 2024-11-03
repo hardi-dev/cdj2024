@@ -18,8 +18,6 @@ function hashPassword(password: string): string {
 
 export async function POST(request: Request) {
   try {
-    console.log("Starting user creation process...");
-
     // Get the current user's session to verify they're an admin
     const supabase = createRouteHandlerClient({ cookies });
     const {
@@ -28,7 +26,6 @@ export async function POST(request: Request) {
     } = await supabase.auth.getSession();
 
     if (sessionError) {
-      console.error("Session error:", sessionError);
       return NextResponse.json(
         { error: "Session error", details: sessionError },
         { status: 401 }
@@ -36,13 +33,11 @@ export async function POST(request: Request) {
     }
 
     if (!session) {
-      console.log("No session found");
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     // Get the new user data from the request
     const body = await request.json();
-    console.log("Request body:", { ...body, password: "[REDACTED]" });
 
     // Create user with admin client
     const { data: authData, error: createError } =
@@ -57,14 +52,11 @@ export async function POST(request: Request) {
       });
 
     if (createError) {
-      console.error("Error creating auth user:", createError);
       return NextResponse.json(
         { error: "Failed to create auth user", details: createError },
         { status: 500 }
       );
     }
-
-    console.log("Auth user created, creating database record...");
 
     // Create user record in our database
     const { error: insertError } = await supabase.from("users").insert([
@@ -81,7 +73,6 @@ export async function POST(request: Request) {
     ]);
 
     if (insertError) {
-      console.error("Error inserting user record:", insertError);
       // Try to clean up auth user if database insert fails
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       return NextResponse.json(
@@ -90,13 +81,11 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("User created successfully");
     return NextResponse.json({
       success: true,
       user: authData.user,
     });
   } catch (error) {
-    console.error("Unexpected error creating user:", error);
     return NextResponse.json(
       { error: "Failed to create user", details: error },
       { status: 500 }

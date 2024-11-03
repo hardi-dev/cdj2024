@@ -14,7 +14,7 @@ export function CreateTeamButton() {
       <Button onClick={() => setOpen(true)}>
         <Plus className="mr-2 h-4 w-4" /> Add Team
       </Button>
-      <CreateTeamDialog open={open} onOpenChange={setOpen} />
+      <CreateTeamDialog open={open} onOpenChange={setOpen}/>
     </>
   );
 }

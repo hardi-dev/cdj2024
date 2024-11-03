@@ -44,7 +44,6 @@ export function TeamsTable() {
     fetchTeams();
   }, []);
 
-  // Dalam fungsi fetchTeams di TeamsTable
   async function fetchTeams() {
     try {
       const { data, error } = await supabase
